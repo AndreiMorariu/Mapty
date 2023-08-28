@@ -18,8 +18,20 @@ class Workout {
   }
 
   _setDescription() {
-    // prettier-ignore
-    const months = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
+    const months = [
+      'January',
+      'February',
+      'March',
+      'April',
+      'May',
+      'June',
+      'July',
+      'August',
+      'September',
+      'October',
+      'November',
+      'December',
+    ];
 
     this.description = `${this.type[0].toUpperCase()}${this.type.slice(1)} on ${
       months[this.date.getMonth()]
@@ -37,7 +49,6 @@ class Running extends Workout {
   }
 
   calcPace() {
-    // min/km
     this.pace = this.duration / this.distance;
     return this.pace;
   }
@@ -58,10 +69,6 @@ class Cycling extends Workout {
   }
 }
 
-// const run = new Running([39, -12], 5.2, 24, 178);
-// const cycling1 = new Cycling([39, -12], 27, 95, 523);
-// console.log(run, cycling1);
-
 class App {
   #map;
   #mapZoomLevel = 13;
@@ -69,13 +76,10 @@ class App {
   #workouts = [];
 
   constructor() {
-    // Get user's position
     this._getPosition();
 
-    // Get data from local storage
     this._getLocalStorage();
 
-    // Attach event handlers
     form.addEventListener('submit', this._newWorkout.bind(this));
     inputType.addEventListener('change', this._toggleElevationField);
     containerWorkouts.addEventListener(
@@ -84,7 +88,7 @@ class App {
         const workoutEl = e.target.closest('.workout');
         if (!workoutEl) return;
         const workout = this.#workouts.find(
-          work => work.id === workoutEl.dataset.id
+          (work) => work.id === workoutEl.dataset.id
         );
         console.log(workout);
 
@@ -123,10 +127,9 @@ class App {
         '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors',
     }).addTo(this.#map);
 
-    //   Handling clicks on map
     this.#map.on('click', this._showForm.bind(this));
 
-    this.#workouts.forEach(work => {
+    this.#workouts.forEach((work) => {
       this._renderWorkout(work);
       this._renderWorkoutMarker(work);
     });
@@ -139,7 +142,6 @@ class App {
   }
 
   _hideForm() {
-    // Empty inputs
     inputDistance.value =
       inputDuration.value =
       inputCadence.value =
@@ -157,23 +159,21 @@ class App {
 
   _newWorkout(e) {
     const validInputs = (...inputs) =>
-      inputs.every(inp => Number.isFinite(inp));
+      inputs.every((inp) => Number.isFinite(inp));
 
-    const allPositive = (...inputs) => inputs.every(inp => inp > 0);
+    const allPositive = (...inputs) => inputs.every((inp) => inp > 0);
 
     e.preventDefault();
 
-    // Get data from the form
     const type = inputType.value;
     const distance = +inputDistance.value;
     const duration = +inputDuration.value;
     const { lat, lng } = this.#mapEvent.latlng;
     let workout;
 
-    // If workout running, create running object
     if (type === 'running') {
       const cadence = +inputCadence.value;
-      // Check if data is valid
+
       if (
         !validInputs(distance, duration, cadence) ||
         !allPositive(distance, duration, cadence)
@@ -182,10 +182,10 @@ class App {
 
       workout = new Running([lat, lng], distance, duration, cadence);
     }
-    // If workout cycling, create running cycling
+
     if (type === 'cycling') {
       const elevation = +inputElevation.value;
-      // Check if data is valid
+
       if (
         !validInputs(distance, duration, elevation) ||
         !allPositive(distance, duration)
@@ -194,19 +194,15 @@ class App {
 
       workout = new Cycling([lat, lng], distance, duration, elevation);
     }
-    // Add new object to workout array
-    this.#workouts.push(workout);
-    console.log(workout);
-    // Render workout on map as marker
-    this._renderWorkoutMarker(workout);
-    // Render workout on list
-    this._renderWorkout(workout);
-    // Hide form + clear input fields
 
-    // Clear input fields
+    this.#workouts.push(workout);
+
+    this._renderWorkoutMarker(workout);
+
+    this._renderWorkout(workout);
+
     this._hideForm();
 
-    // Set local storage to all workouts
     this._setLocalStorage();
   }
 
@@ -291,7 +287,7 @@ class App {
 
     this.#workouts = data;
 
-    this.#workouts.forEach(work => {
+    this.#workouts.forEach((work) => {
       this._renderWorkout(work);
     });
   }
